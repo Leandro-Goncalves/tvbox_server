@@ -4,6 +4,9 @@ import { compare, crypt } from '../password';
 import jwt from 'jsonwebtoken';
 import http from 'http'
 import { Server } from 'socket.io'
+import dayjs from 'dayjs';
+
+const DAYS_TO_WARNING = 7;
 
 const app = express();
 const port = 21127;
@@ -81,9 +84,31 @@ async function main() {
     io.on('connection', (socket) => {
         console.log('user connected');
 
-        socket.on("user", (guid) => {
+        socket.on("user", async (guid) => {
             console.log(guid)
+
             socket.join(guid)
+            const user = await prisma.user.findUnique({
+                where: {
+                    guid
+                }
+            })
+
+            if(!user)return;
+
+            console.log(user.expirationDate);
+            console.log(new Date());
+            if(user.expirationDate < new Date()){
+               socket.emit("expired")
+               return;
+            }
+
+            if(dayjs(user.expirationDate).add(DAYS_TO_WARNING, "day").isAfter(new Date)){
+                
+                socket.emit("warning", dayjs(user.expirationDate).diff(new Date, "day"))
+               return;
+            }
+
         })
 
         socket.on('disconnect', function () {
@@ -97,19 +122,12 @@ async function main() {
 }
 
 main()
-
   .then(async () => {
-
     await prisma.$disconnect()
-
   })
 
   .catch(async (e) => {
-
     console.error(e)
-
     await prisma.$disconnect()
-
     process.exit(1)
-
   })

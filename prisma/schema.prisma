@@ -16,4 +16,5 @@ model user {
   password String
   isLogged Boolean?
   app      String?
+  expirationDate DateTime @default(now())
 }
