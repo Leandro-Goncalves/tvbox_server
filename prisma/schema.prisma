@@ -11,10 +11,18 @@ datasource db {
 }
 
 model user {
-  guid     String @id @default(uuid())
-  name     String @unique
-  password String
-  isLogged Boolean?
-  app      String?
-  expirationDate DateTime @default(now())
+  guid           String    @id @default(uuid())
+  name           String    @unique
+  password       String
+  isLogged       Boolean?
+  expirationDate DateTime  @default(now())
+  userApp        userApp[]
+}
+
+model userApp {
+  guid     String   @id @default(uuid())
+  name     String
+  startAt  DateTime
+  user     user     @relation(fields: [userGuid], references: [guid])
+  userGuid String   @unique
 }

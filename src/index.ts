@@ -23,7 +23,7 @@ enum Rules {
 
 async function main() {
     app.use(express.json())
-    app.use(express.urlencoded({ extended: true}))
+    app.use(express.urlencoded({ extended: true }))
 
     app.post("/login", async (req, res) => {
         const name = req.body.name
@@ -42,22 +42,22 @@ async function main() {
 
         console.log(user)
 
-        if(!user){
+        if (!user) {
             return res.json({
                 error: "Usuario não encontrado"
             })
         }
 
         const isPasswordCorrect = await compare(password, user.password)
-        if(!isPasswordCorrect){
+        if (!isPasswordCorrect) {
             return res.json({
                 error: "Usuario não encontrado"
-            })  
+            })
         }
 
         const token = jwt.sign({ rules: [Rules.user] }, process.env.JWT_SECRET ?? "")
 
-        res.json({name: user.name, guid: user.guid, token})
+        res.json({ name: user.name, guid: user.guid, token })
     })
 
     app.post("/register", async (req, res) => {
@@ -86,48 +86,98 @@ async function main() {
 
         socket.on("user", async (guid) => {
             console.log(guid)
+            await prisma.user.update({
+                where: {
+                    guid,
+                },
+                data: {
+                    isLogged: true
+                }
+            })
 
-            socket.join(guid)
+            socket.join(guid);
+            socket.data.guid = guid
+
+            socket.on('removeApp', async function () {
+                console.log('user remove app');
+                await prisma.userApp.delete({
+                    where: {
+                        userGuid: guid,
+                    },
+                })
+            });
+
+            socket.on('openApp', async function (name: string) {
+                console.log('user update', name);
+                await prisma.userApp.upsert({
+                    where: {
+                        userGuid: guid,
+                    },
+                    create: {
+                        name,
+                        startAt: new Date,
+                        userGuid: guid
+                    },
+                    update: {
+                        name,
+                        startAt: new Date,
+                        userGuid: guid
+                    }
+                })
+            });
+
             const user = await prisma.user.findUnique({
                 where: {
                     guid
                 }
             })
 
-            if(!user)return;
+            if (!user) return;
 
             console.log(user.expirationDate);
             console.log(new Date());
-            if(user.expirationDate < new Date()){
-               socket.emit("expired")
-               return;
+            if (user.expirationDate < new Date()) {
+                socket.emit("expired")
+                return;
             }
 
-            if(dayjs(user.expirationDate).add(DAYS_TO_WARNING, "day").isAfter(new Date)){
-                
+            if (dayjs(user.expirationDate).add(DAYS_TO_WARNING, "day").isAfter(new Date)) {
+
                 socket.emit("warning", dayjs(user.expirationDate).diff(new Date, "day"))
-               return;
+                return;
             }
-
         })
 
-        socket.on('disconnect', function () {
-          console.log('user disconnected');
+        socket.on('disconnect', async function () {
+            await prisma.user.update({
+                where: {
+                    guid: socket.data.guid,
+                },
+                data: {
+                    isLogged: false
+                }
+            })
+
+            await prisma.userApp.delete({
+                where: {
+                    userGuid: socket.data.guid,
+                },
+            })
         });
-      })
+    })
 
     server.listen(port, () => {
-        console.log("running on port "+port)
+        console.log("running on port " + port)
     })
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
+    .then(async () => {
+        await prisma.$disconnect()
+    })
 
-  .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+    .catch(async (e) => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+    })
