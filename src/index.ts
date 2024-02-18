@@ -30,11 +30,13 @@ async function main() {
   app.delete("/user/:guid", async (req, res) => {
     const guid = req.params.guid;
 
-    return await prisma.user.delete({
+    await prisma.user.delete({
       where: {
         guid: guid,
       },
     });
+
+    return res.json({});
   });
 
   app.post("/login", async (req, res) => {
