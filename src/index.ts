@@ -5,10 +5,12 @@ import jwt from "jsonwebtoken";
 import http from "http";
 import { Server } from "socket.io";
 import dayjs from "dayjs";
+import cors from "cors";
 
 const DAYS_TO_WARNING = 7;
 
 const app = express();
+app.use(cors());
 const port = 21127;
 
 const server = http.createServer(app);
