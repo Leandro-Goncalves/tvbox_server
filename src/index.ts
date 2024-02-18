@@ -86,6 +86,13 @@ async function main() {
         name: true,
         isLogged: true,
         expirationDate: true,
+        userApp: {
+          select: {
+            guid: true,
+            name: true,
+            startAt: true,
+          },
+        },
       },
     });
     res.json(users);
