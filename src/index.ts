@@ -30,7 +30,7 @@ async function main() {
   app.delete("/user/:guid", async (req, res) => {
     const guid = req.params.guid;
 
-    await prisma.user.delete({
+    return await prisma.user.delete({
       where: {
         guid: guid,
       },
