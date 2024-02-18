@@ -27,6 +27,16 @@ async function main() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  app.delete("/user/:guid", async (req, res) => {
+    const guid = req.params.guid;
+
+    await prisma.user.delete({
+      where: {
+        guid: guid,
+      },
+    });
+  });
+
   app.post("/login", async (req, res) => {
     const name = req.body.name;
     const password = req.body.password;
