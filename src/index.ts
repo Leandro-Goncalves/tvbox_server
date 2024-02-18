@@ -80,7 +80,14 @@ async function main() {
   });
 
   app.get("/users", async (req, res) => {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      select: {
+        guid: true,
+        name: true,
+        isLogged: true,
+        expirationDate: true,
+      },
+    });
     res.json(users);
   });
 
