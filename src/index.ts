@@ -95,7 +95,7 @@ async function main() {
         },
       },
     });
-    res.json(users);
+    res.json(users.map((user) => ({ ...user, userApp: user.userApp[0] })));
   });
 
   app.post("/reboot", (req, res) => {
