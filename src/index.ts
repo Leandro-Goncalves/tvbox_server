@@ -105,6 +105,9 @@ async function main() {
         isBlocked,
       },
     });
+    if (isBlocked) {
+      io.to(guid).emit("reboot");
+    }
     res.send("ok");
   });
 
@@ -194,9 +197,9 @@ async function main() {
       }
 
       if (
-        dayjs(user.expirationDate)
+        dayjs(new Date())
           .add(DAYS_TO_WARNING, "day")
-          .isAfter(new Date())
+          .isAfter(user.expirationDate)
       ) {
         socket.emit(
           "warning",
