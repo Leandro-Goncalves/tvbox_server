@@ -105,6 +105,7 @@ async function main() {
         isBlocked,
       },
     });
+    res.send("ok");
   });
 
   app.get("/users", async (req, res) => {
