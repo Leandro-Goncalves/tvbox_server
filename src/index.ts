@@ -95,7 +95,7 @@ async function main() {
 
   app.post("/user/:guid/block", async (req, res) => {
     const guid = req.params.guid;
-    const isBlocked = req.body.isBlocked === "true";
+    const isBlocked = req.body.isBlocked === true;
 
     await prisma.user.update({
       where: {
