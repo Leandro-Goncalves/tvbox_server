@@ -2,10 +2,14 @@ import { PrismaClient } from "@prisma/client";
 import express from "express";
 import { compare, crypt } from "../password";
 import jwt from "jsonwebtoken";
-import http from "http";
+import https from "https";
 import { Server } from "socket.io";
 import dayjs from "dayjs";
 import cors from "cors";
+import * as fs from "fs";
+
+var privateKey = fs.readFileSync("server.key");
+var certificate = fs.readFileSync("server.crt");
 
 const DAYS_TO_WARNING = 7;
 
@@ -13,7 +17,13 @@ const app = express();
 app.use(cors());
 const port = 21127;
 
-const server = http.createServer(app);
+const server = https.createServer(
+  {
+    key: privateKey,
+    cert: certificate,
+  },
+  app
+);
 const io = new Server(server);
 
 const prisma = new PrismaClient();
