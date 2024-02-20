@@ -7,9 +7,10 @@ import { Server } from "socket.io";
 import dayjs from "dayjs";
 import cors from "cors";
 import * as fs from "fs";
+import path from "path";
 
-var privateKey = fs.readFileSync("server.key");
-var certificate = fs.readFileSync("server.crt");
+var privateKey = fs.readFileSync(path.join(__dirname, "../", "key.pem"));
+var certificate = fs.readFileSync(path.join(__dirname, "../", "cert.pem"));
 
 const DAYS_TO_WARNING = 7;
 
