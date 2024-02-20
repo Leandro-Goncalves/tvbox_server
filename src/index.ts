@@ -93,12 +93,27 @@ async function main() {
     res.json(user);
   });
 
+  app.post("/user/:guid/block", async (req, res) => {
+    const guid = req.params.guid;
+    const isBlocked = req.body.isBlocked === "true";
+
+    await prisma.user.update({
+      where: {
+        guid,
+      },
+      data: {
+        isBlocked,
+      },
+    });
+  });
+
   app.get("/users", async (req, res) => {
     const users = await prisma.user.findMany({
       select: {
         guid: true,
         name: true,
         isLogged: true,
+        isBlocked: true,
         expirationDate: true,
         userApp: {
           select: {

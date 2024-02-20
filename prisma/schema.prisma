@@ -15,6 +15,7 @@ model user {
   name           String    @unique
   password       String
   isLogged       Boolean?
+  isBlocked      Boolean?  @default(false)
   expirationDate DateTime  @default(now())
   userApp        userApp[]
 }
