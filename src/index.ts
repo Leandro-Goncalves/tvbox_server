@@ -38,6 +38,33 @@ async function main() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  app.post("/user/:guid/expire", async (req, res) => {
+    const guid = req.params.guid;
+
+    const days = req.body.days;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        guid,
+      },
+    });
+
+    if (!user) {
+      return res.json({});
+    }
+
+    await prisma.user.update({
+      where: {
+        guid,
+      },
+      data: {
+        expirationDate: dayjs(user.expirationDate)
+          .add(days, "day")
+          .toISOString(),
+      },
+    });
+  });
+
   app.delete("/user/:guid", async (req, res) => {
     const guid = req.params.guid;
 
