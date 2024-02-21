@@ -63,6 +63,7 @@ async function main() {
           .toISOString(),
       },
     });
+    return res.json({});
   });
 
   app.post("/user/:guid/expire/day", async (req, res) => {
