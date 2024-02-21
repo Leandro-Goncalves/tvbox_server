@@ -255,6 +255,11 @@ async function main() {
 
       if (!user) return;
 
+      if (user.isBlocked) {
+        socket.emit("blocked");
+        return;
+      }
+
       console.log(user.expirationDate);
       console.log(new Date());
       if (user.expirationDate < new Date()) {
