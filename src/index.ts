@@ -91,6 +91,7 @@ async function main() {
           .toISOString(),
       },
     });
+    return res.json({});
   });
 
   app.delete("/user/:guid", async (req, res) => {
@@ -221,11 +222,19 @@ async function main() {
 
       socket.on("removeApp", async function () {
         console.log("user remove app");
-        await prisma.userApp.delete({
+        const userApp = await prisma.userApp.findUnique({
           where: {
             userGuid: guid,
           },
         });
+
+        if (userApp) {
+          await prisma.userApp.delete({
+            where: {
+              userGuid: guid,
+            },
+          });
+        }
       });
 
       socket.on("openApp", async function (name: string) {
