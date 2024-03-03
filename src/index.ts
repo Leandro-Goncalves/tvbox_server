@@ -208,6 +208,7 @@ async function main() {
 
     socket.on("user", async (guid) => {
       console.log(guid);
+
       await prisma.user.update({
         where: {
           guid,
@@ -265,7 +266,7 @@ async function main() {
       if (!user) return;
 
       if (user.isBlocked) {
-        socket.emit("blocked");
+        socket.emit("expired");
         return;
       }
 
