@@ -263,15 +263,17 @@ async function main() {
         },
       });
 
-      if (!user) return;
+      if (!user) {
+        socket.emit("expired");
+        return;
+      }
 
+      console.log(user.name, user.isBlocked);
       if (user.isBlocked) {
         socket.emit("expired");
         return;
       }
 
-      console.log(user.expirationDate);
-      console.log(new Date());
       if (user.expirationDate < new Date()) {
         socket.emit("expired");
         return;
