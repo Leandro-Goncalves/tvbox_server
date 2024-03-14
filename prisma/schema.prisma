@@ -14,7 +14,7 @@ model user {
   guid           String    @id @default(uuid())
   name           String    @unique
   password       String
-  isLogged       Boolean?
+  isLogged       Boolean?  @default(false)
   isBlocked      Boolean?  @default(false)
   expirationDate DateTime  @default(now())
   userApp        userApp[]
