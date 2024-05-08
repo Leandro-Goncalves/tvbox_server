@@ -293,7 +293,8 @@ async function main() {
     });
 
     socket.on("disconnect", async function () {
-      await prisma.user.updateMany({
+      console.log("disconnect", socket.data.guid);
+      await prisma.user.update({
         where: {
           guid: socket.data.guid,
         },
@@ -302,7 +303,7 @@ async function main() {
         },
       });
 
-      await prisma.userApp.deleteMany({
+      await prisma.userApp.delete({
         where: {
           userGuid: socket.data.guid,
         },
