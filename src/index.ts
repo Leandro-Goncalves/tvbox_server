@@ -110,6 +110,8 @@ async function main() {
     const name = req.body.name;
     const password = req.body.password;
 
+    console.log("login", name, password);
+
     const user = await prisma.user.findUnique({
       where: {
         name,
@@ -303,7 +305,7 @@ async function main() {
         },
       });
 
-      await prisma.userApp.delete({
+      await prisma.userApp.deleteMany({
         where: {
           userGuid: socket.data.guid,
         },
